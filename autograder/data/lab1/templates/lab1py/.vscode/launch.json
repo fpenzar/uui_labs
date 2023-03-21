@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BFS",
+            "type": "python",
+            "request": "launch",
+            "program": "solution.py",
+            "console": "integratedTerminal",
+            "args": ["--ss", "/home/filip/Work/FER/6_semestar/uvod_u_umjetnu_inteligenciju/labosi/autograder/data/lab1/templates/lab1py/files/ai.txt",
+                    "--alg", "bfs"],
+            "justMyCode": true
+        },
+        {
+            "name": "UCS",
+            "type": "python",
+            "request": "launch",
+            "program": "solution.py",
+            "console": "integratedTerminal",
+            "args": ["--ss", "/home/filip/Work/FER/6_semestar/uvod_u_umjetnu_inteligenciju/labosi/autograder/data/lab1/templates/lab1py/files/ai.txt",
+                    "--alg", "ucs"],
+            "justMyCode": true
+        },
+        {
+            "name": "A-STAR",
+            "type": "python",
+            "request": "launch",
+            "program": "solution.py",
+            "console": "integratedTerminal",
+            "args": ["--ss", "/home/filip/Work/FER/6_semestar/uvod_u_umjetnu_inteligenciju/labosi/autograder/data/lab1/templates/lab1py/files/ai.txt",
+                    "--alg", "astar", "--h", "/home/filip/Work/FER/6_semestar/uvod_u_umjetnu_inteligenciju/labosi/autograder/data/lab1/templates/lab1py/files/ai_fail.txt"],
+            "justMyCode": true
+        }
+    ]
+}

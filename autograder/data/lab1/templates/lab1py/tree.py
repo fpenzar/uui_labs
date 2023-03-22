@@ -85,7 +85,7 @@ class Tree:
         return False
     
 
-    # this is used in generating h* for checking consistency
+    # this is used in generating h* for checking optimistic
     def ucs(self, start_state=None, goal_states=None, expand_function=None):
         if start_state is None:
             start_state = self.graph.get_start()

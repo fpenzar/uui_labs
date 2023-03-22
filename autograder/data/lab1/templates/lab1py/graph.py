@@ -1,5 +1,7 @@
 from state import State
 import bisect
+from heapq import heappop, heappush
+
 
 
 class Graph:
@@ -8,21 +10,26 @@ class Graph:
         self.states = {}
         self.heuristics = {}
         self.goal_states = set()
+        self.reverse_states = {}
 
 
     def add_state(self, state: str):
         self.states.update({state: []})
+        if state not in self.reverse_states:
+            self.reverse_states.update({state: []})
     
 
     def add_child_to_state(self, parent: str, child_name: str, cost: float):
         child = State(child_name, cost)
         # insert sorted by name
         bisect.insort(self.states[parent], child)
-    
 
-    def reverse_graph(self):
-        ...
-    
+        # add to reverse list (for backward searching)
+        parent = State(parent, cost)
+        if child_name not in self.reverse_states:
+            self.reverse_states.update({child_name: []})
+        self.reverse_states[child_name].append(parent)
+
 
     def get_all_states(self):
         return self.states
@@ -45,10 +52,14 @@ class Graph:
             state = parsed[0]
             heuristic = float(parsed[1])
             self.heuristics.update({state: heuristic})
-    
+
 
     def expand(self, parent_name: str):
         return self.states[parent_name]
+
+
+    def expand_reverse(self, child_name: str):
+        return self.reverse_states[child_name]
 
 
     def goal(self, state: str):

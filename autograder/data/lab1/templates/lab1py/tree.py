@@ -76,6 +76,9 @@ class Tree:
                 return True
             # iterate over children
             for child in self.graph.expand(current_node.name):
+                # skip state if already closed
+                if child.name in self.closed:
+                    continue
                 new_node = Node(child.name, depth=current_node.depth+1, 
                                 parent=current_node, cost=current_node.cost+child.cost)
                 # insert into open
@@ -83,8 +86,15 @@ class Tree:
         return False
     
 
-    def ucs(self):
-        start_state = self.graph.get_start()
+    # this is used in generating h* for checking consistency
+    def ucs(self, start_state=None, goal_states=None, expand_function=None):
+        if start_state is None:
+            start_state = self.graph.get_start()
+        if goal_states is None:
+            goal_states = self.graph.goal_states
+        if expand_function is None:
+            expand_function = self.graph.expand
+        
         start_node = Node(start_state, depth=0, parent=None, cost=0)
         open = [start_node]
         self.closed = {}
@@ -96,16 +106,19 @@ class Tree:
             # add state to closed
             self.closed.update({current_node.name: current_node.cost})
             # check if the current node is the solution
-            if self.graph.goal(current_node.name):
+            if current_node.name in goal_states:
                 self.solution = current_node
                 return True
             # iterate over children
-            for child in self.graph.expand(current_node.name):
+            for child in expand_function(current_node.name):
+                # skip state if already closed
+                if child.name in self.closed:
+                    continue
                 new_node = Node(child.name, depth=current_node.depth+1, 
                                 parent=current_node, cost=current_node.cost+child.cost)
                 # insert sorted by cost, then name
                 heappush(open, new_node)
-        return False
+        return None
     
 
     def a_star(self):
@@ -180,5 +193,40 @@ class Tree:
         print(f"[CONCLUSION]: Heuristic is {conclusion}.")
     
 
+    def generate_h_star(self):
+        # initialize all values to inf (as if the states were not connected)
+        self.h_star = {state: float("inf") for state in self.graph.get_all_states()}
+
+        # start from each goal state
+        for goal_state in self.graph.goal_states:
+            # run ucs from each goal state (withohut end states to run it on the whole graph)
+            self.ucs(start_state=goal_state, goal_states=[], expand_function=self.graph.expand_reverse)
+            # the results for the whole graph are in self.closed
+            for closed_state, value in self.closed.items():
+                # update the self.h_star values
+                if value < self.h_star[closed_state]:
+                    self.h_star[closed_state] = value
+    
+
     def check_optimistic(self):
-        ...
+        print(f"# HEURISTIC-OPTIMISTIC {self.graph.heuristics_path}")
+        # generate h_star values for the graph
+        self.generate_h_star()
+        # flag to keep track if the heuristic is optimistic
+        optimistic = True
+        for state in self.graph.get_all_states():
+            h = self.graph.get_heuristic(state)
+            h_star = self.h_star[state]
+            if h <= h_star:
+                condition = "[OK]"
+            else:
+                condition = "[ERR]"
+                optimistic = False
+            h_formated = "{:.1f}".format(h)
+            h_star_formated = "{:.1f}".format(h_star)
+            print(f"[CONDITION]: {condition} h({state}) <= h*: {h_formated} <= {h_star_formated}")
+        if optimistic:
+            conclusion = "optimistic"
+        else:
+            conclusion = "not optimistic"
+        print(f"[CONCLUSION]: Heuristic is {conclusion}.")

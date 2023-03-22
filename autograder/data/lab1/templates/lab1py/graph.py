@@ -20,6 +20,14 @@ class Graph:
         bisect.insort(self.states[parent], child)
     
 
+    def reverse_graph(self):
+        ...
+    
+
+    def get_all_states(self):
+        return self.states
+    
+
     def get_heuristic(self, state: str):
         return self.heuristics[state]
     

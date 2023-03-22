@@ -153,3 +153,32 @@ class Tree:
                 heappush(open, new_node)
                 open_map.update({new_node.name: new_node.cost})
         return False
+    
+
+    def check_consistency(self):
+        print(f"# HEURISTIC-CONSISTENT {self.graph.heuristics_path}")
+        # flag to keep track if the heuristic is consistent
+        consistent = True
+        for state, children in self.graph.get_all_states().items():
+            h_state = self.graph.get_heuristic(state)
+            for child in children:
+                h_child = self.graph.get_heuristic(child.name)
+                cost_and_h_child = h_child + child.cost
+                if h_state <= cost_and_h_child:
+                    condition = "[OK]"
+                else:
+                    condition = "[ERR]"
+                    consistent = False
+                h_formated = "{:.1f}".format(h_state)
+                h_child_formated = "{:.1f}".format(h_child)
+                child_cost_formated = "{:.1f}".format(child.cost)
+                print(f"[CONDITION]: {condition} h({state}) <= h({child.name}) + c: {h_formated} <= {h_child_formated} + {child_cost_formated}")
+        if consistent:
+            conclusion = "consistent"
+        else:
+            conclusion = "not consistent"
+        print(f"[CONCLUSION]: Heuristic is {conclusion}.")
+    
+
+    def check_optimistic(self):
+        ...

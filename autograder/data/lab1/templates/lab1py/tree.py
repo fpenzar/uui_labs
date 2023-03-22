@@ -1,7 +1,6 @@
 from heapq import heappop, heappush
 from graph import Graph
 from node import Node
-import bisect
 
 
 class Tree:

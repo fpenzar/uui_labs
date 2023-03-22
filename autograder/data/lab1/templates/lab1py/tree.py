@@ -1,3 +1,4 @@
+from heapq import heappop, heappush
 from graph import Graph
 from node import Node
 import bisect
@@ -68,7 +69,7 @@ class Tree:
             if current_node.name in self.closed:
                 continue
             # add state to closed
-            self.closed.update({current_node.name, current_node.cost})
+            self.closed.update({current_node.name: current_node.cost})
             # check if the current node is the solution
             if self.graph.goal(current_node.name):
                 self.solution = current_node
@@ -88,12 +89,12 @@ class Tree:
         open = [start_node]
         self.closed = {}
         while len(open):
-            current_node = open.pop(0)
+            current_node = heappop(open)
             # skip state if already closed
             if current_node.name in self.closed:
                 continue
             # add state to closed
-            self.closed.update({current_node.name, current_node.cost})
+            self.closed.update({current_node.name: current_node.cost})
             # check if the current node is the solution
             if self.graph.goal(current_node.name):
                 self.solution = current_node
@@ -103,18 +104,22 @@ class Tree:
                 new_node = Node(child.name, depth=current_node.depth+1, 
                                 parent=current_node, cost=current_node.cost+child.cost)
                 # insert sorted by cost, then name
-                bisect.insort(open, new_node)
+                heappush(open, new_node)
         return False
     
 
     def a_star(self):
         start_state = self.graph.get_start()
-        start_node = Node(start_state, depth=0, parent=None, cost=0, astar=True, heuristic=self.graph.get_heuristic(start_state))
+        start_node = Node(start_state, depth=0, parent=None, cost=0, astar=True, 
+                          heuristic=self.graph.get_heuristic(start_state))
         open = [start_node]
         self.closed = dict()
         open_map = {start_node.name: start_node.cost} # used for hashing for speed
         while len(open):
-            current_node = open.pop(0)
+            current_node = heappop(open)
+            # skip state if already closed
+            if current_node.name in self.closed:
+                continue
             # remove from open_map
             del open_map[current_node.name]
         
@@ -142,8 +147,9 @@ class Tree:
                         del self.closed[child.name]
                 
                 new_node = Node(child.name, depth=current_node.depth+1, 
-                                parent=current_node, cost=cost, astar=True, heuristic=self.graph.get_heuristic(child.name))
+                                parent=current_node, cost=cost, astar=True, 
+                                heuristic=self.graph.get_heuristic(child.name))
                 # insert sorted by cost, then name
-                bisect.insort(open, new_node)
+                heappush(open, new_node)
                 open_map.update({new_node.name: new_node.cost})
         return False

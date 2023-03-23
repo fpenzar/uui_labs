@@ -86,18 +86,23 @@ class Tree:
     
 
     # this is used in generating h* for checking optimistic
-    def ucs(self, start_state=None, goal_states=None, expand_function=None):
-        if start_state is None:
-            start_state = self.graph.get_start()
+    def ucs(self, start_states=None, goal_states=None, expand_function=None):
+        if start_states is None:
+            start_states = [self.graph.get_start()]
         if goal_states is None:
             goal_states = self.graph.goal_states
         if expand_function is None:
             expand_function = self.graph.expand
         
-        start_node = Node(start_state, depth=0, parent=None, cost=0)
-        open = [start_node]
+        open = []
+        for start_state in start_states:
+            start_node = Node(start_state, depth=0, parent=None, cost=0)
+            heappush(open, start_node)
         self.closed = {}
         while len(open):
+            # if all states have been closed break
+            if len(self.closed) == len(self.graph.get_all_states()):
+                break
             current_node = heappop(open)
             # skip state if already closed
             if current_node.name in self.closed:
@@ -196,15 +201,13 @@ class Tree:
         # initialize all values to inf (as if the states were not connected)
         self.h_star = {state: float("inf") for state in self.graph.get_all_states()}
 
-        # start from each goal state
-        for goal_state in self.graph.goal_states:
-            # run ucs from each goal state (withohut end states to run it on the whole graph)
-            self.ucs(start_state=goal_state, goal_states=[], expand_function=self.graph.expand_reverse)
-            # the results for the whole graph are in self.closed
-            for closed_state, value in self.closed.items():
-                # update the self.h_star values
-                if value < self.h_star[closed_state]:
-                    self.h_star[closed_state] = value
+        # run ucs from each goal state (withohut end states to run it on the whole graph)
+        self.ucs(start_states=self.graph.goal_states, goal_states=[], expand_function=self.graph.expand_reverse)
+        # the results for the whole graph are in self.closed
+        for closed_state, value in self.closed.items():
+            # update the self.h_star values
+            if value < self.h_star[closed_state]:
+                self.h_star[closed_state] = value
     
 
     def check_optimistic(self):

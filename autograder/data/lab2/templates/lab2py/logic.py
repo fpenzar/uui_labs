@@ -203,7 +203,7 @@ class logic_tree:
             for i, negated in enumerate(self.negated_test_clauses):
                 print(f"{i + 1 + len(self.premises)}. {negated}")
             print("===============")
-            print(f"[CONCLUSION]: {self.test_clause.original_text} is unknown")
+            print(f"[CONCLUSION]: {self.test_clause} is unknown")
             return
 
         to_print = set()

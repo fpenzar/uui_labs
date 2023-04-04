@@ -119,7 +119,6 @@ class logic_tree:
             clauses.remove(k)
     
 
-    # TODO ovjde je potencijalna greska ako se duplo dodaje
     def selectClauses(self, sos, clauses):
         pairs = []
         for c1 in clauses:
@@ -138,6 +137,10 @@ class logic_tree:
     def plResolution(self, test_klauzula: klauzula):
         self.test_clause = test_klauzula
         self.negated_test_clauses = test_klauzula.negate()
+        # adding the row just to keep track of which clause is older (important for printing the results)
+        # set row for premises
+        for i, clause in enumerate(self.premises):
+            clause.add_row(i + 1)
         # set row for negated test clauses
         for i, clause in enumerate(self.negated_test_clauses):
             clause.add_row(i + len(self.premises) + 1)
@@ -227,3 +230,21 @@ class logic_tree:
             print(clause.print_format())
         print("===============")
         print(f"[CONCLUSION]: {self.test_clause} is true")
+    
+
+    def cooking_assistant(self, cooking_orders):
+        for clause, command in cooking_orders:
+            print("--------------------------------------------------------")
+            print(f"Users command: {str(clause)} {command}")
+            if command == "+":
+                print(f"Added {clause}")
+                self.add(clause)
+            elif command == "-":
+                print(f"Removed {clause}")
+                self.remove(clause)
+            else:
+                self.plResolution(clause)
+                self.print()
+            print("--------------------------------------------------------")
+
+        

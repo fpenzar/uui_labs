@@ -45,5 +45,22 @@ class Parser:
             premises.append(clause)
         
         return logic_tree(premises)
+    
+
+    def parse_cooking_orders(self):
+        orders = []
+        with open(self.cooking_orders, "r") as file:
+            lines = file.readlines()
+            lines = [line.strip() for line in lines]
+        
+        for line in lines:
+            if line.startswith("#"):
+                continue
+            command = line[-1]
+            line = line[:-2]
+            literals = line.lower().split(" v ")
+            clause = klauzula(literals, None, None)
+            orders.append((clause, command))
+        return orders
 
     

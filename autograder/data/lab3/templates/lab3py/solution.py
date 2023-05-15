@@ -8,3 +8,4 @@ if __name__ == "__main__":
     train_dataset, test_dataset = parser.parse()
     model = ID3(parser.depth)
     model.fit(train_dataset)
+    model.predict(test_dataset)

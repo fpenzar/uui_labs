@@ -35,6 +35,21 @@ class data_point:
         return hash("".join(self.labels + self.values))
 
 
+class feature_with_IG:
+    def __init__(self, feature, IG):
+        self.feature = feature
+        self.IG = IG
+
+    def __lt__(self, other):
+        if other.IG == self.IG:
+            return self.feature > other.feature
+        return self.IG < other.IG
+    
+
+    def __repr__(self):
+        return f"IG({self.feature})={self.IG}"
+
+
 class feature_count:
 
     def __init__(self, feature_value):
@@ -46,8 +61,41 @@ class feature_count:
 
     def __lt__(self, other):
         if other.count == self.count:
-            return self.feature_value < other.feature_value
+            return self.feature_value > other.feature_value
         return self.count < other.count
+
+class confusion_matrix:
+
+    def __init__(self):
+        self.values = set()
+        self.matrix = dict()
+    
+    def add(self, real_value, predicted_value):
+        self.values.add(real_value)
+        self.values.add(predicted_value)
+        if real_value not in self.matrix:
+            self.matrix[real_value] = {}
+        if predicted_value not in self.matrix[real_value]:
+            self.matrix[real_value][predicted_value] = 0
+        self.matrix[real_value][predicted_value] += 1
+    
+    def print(self):
+        values_sorted = sorted(list(self.values))
+        for value in values_sorted:
+            if value not in self.matrix:
+                self.matrix[value] = {}
+        for real_value in self.matrix:
+            for value in values_sorted:
+                if value not in self.matrix[real_value]:
+                    self.matrix[real_value][value] = 0
+        
+        print("[CONFUSION_MATRIX]:")
+        for real_value in values_sorted:
+            for i, predicted_value in enumerate(values_sorted):
+                if i != len(values_sorted) - 1:
+                    print(self.matrix[real_value][predicted_value], end=" ")
+                else:
+                    print(self.matrix[real_value][predicted_value])
 
 
 class feauture_counter_list:
@@ -63,3 +111,11 @@ class feauture_counter_list:
     
     def get_most_common(self):
         return sorted(list(self.dict.values()))[-1].feature_value
+
+
+    def items(self):
+        return self.dict.items()
+    
+
+    def __getitem__(self, key):
+        return self.dict[key]
